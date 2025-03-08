@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Time Traveler - Papyrus Scroll</title>
+  <style>
+    /* Basic reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    /* Papyrus scroll background styling */
+    body {
+      background: #f7e7ce;
+      font-family: 'Papyrus', cursive, sans-serif;
+      color: #4e342e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 20px;
+    }
+    .scroll {
+      background: #fdf5e6;
+      border: 10px solid #d2b48c;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      padding: 30px;
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2em;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 80%;
+      font-size: 1em;
+      border: 2px solid #d2b48c;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      background: #d2b48c;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #c4a484;
+    }
+    .result-section {
+      margin-top: 20px;
+      font-size: 1.2em;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div class="scroll">
+    <h1>Time Traveler</h1>
+    <p>Enter a time period (e.g., <strong>1900 B.C.</strong> or <strong>2020 AD</strong>):</p>
+    <input type="text" id="timeInput" placeholder="e.g., 2500 BC">
+    <br>
+    <button onclick="calculateTimeDifference()">Calculate</button>
+    <div id="result" class="result-section"></div>
+  </div>
+
+  <script>
+    function calculateTimeDifference() {
+      let input = document.getElementById('timeInput').value.trim();
+      if (input === "") {
+        document.getElementById('result').textContent = "Please enter a valid time period.";
+        return;
+      }
+      
+      // Check for markers and parse the year
+      let isBC = false;
+      let isAD = false;
+      let lowerInput = input.toLowerCase();
+      
+      if (lowerInput.includes('bc')) {
+        isBC = true;
+        lowerInput = lowerInput.replace('bc', '').replace('.', '').trim();
+      } else if (lowerInput.includes('ad')) {
+        isAD = true;
+        lowerInput = lowerInput.replace('ad', '').replace('.', '').trim();
+      }
+      
+      let year = parseInt(lowerInput);
+      if (isNaN(year)) {
+        document.getElementById('result').textContent = "Please enter a valid year.";
+        return;
+      }
+      
+      // Use astronomical year numbering:
+      // AD years are positive, while BC years are negative.
+      // (Note: This simple conversion ignores the absence of a year 0.)
+      let inputYearNumeric = isBC ? -year : year;
+      
+      // Get the current year
+      let currentYear = new Date().getFullYear();
+      
+      // 1) How far back is the entered time period from today?
+      let diffToday = currentYear - inputYearNumeric;
+      let todayRelation = diffToday >= 0 ? "ago" : "in the future";
+      diffToday = Math.abs(diffToday);
+      let diffTodayThousand = Math.round((diffToday / 1000) * 10) / 10;
+      
+      // 2) Relative to the foundation of Oxford University (c. 1096 AD)
+      const oxfordYear = 1096;
+      let diffOxford, oxfordRelation;
+      if (inputYearNumeric < oxfordYear) {
+        diffOxford = oxfordYear - inputYearNumeric;
+        oxfordRelation = "before";
+      } else {
+        diffOxford = inputYearNumeric - oxfordYear;
+        oxfordRelation = "after";
+      }
+      let diffOxfordThousand = Math.round((diffOxford / 1000) * 10) / 10;
+      
+      // 3) Relative to the oldest recorded civilization (representative date: 3500 BC)
+      // Here, 3500 BC is represented as -3500 in astronomical numbering.
+      const oldestCivYear = -3500;
+      let diffOld, oldRelation;
+      if (inputYearNumeric < oldestCivYear) {
+        diffOld = oldestCivYear - inputYearNumeric;
+        oldRelation = "before";
+      } else {
+        diffOld = inputYearNumeric - oldestCivYear;
+        oldRelation = "after";
+      }
+      let diffOldThousand = Math.round((diffOld / 1000) * 10) / 10;
+      
+      // Construct the result message with the three comparisons
+      let resultMsg = `
+        <p>The entered time period (<strong>${input}</strong>) is approximately <strong>${diffTodayThousand}</strong> thousand years ${todayRelation} today.</p>
+        <p>It is approximately <strong>${diffOxfordThousand}</strong> thousand years ${oxfordRelation} the foundation of Oxford University (c. 1096 AD).</p>
+        <p>It is approximately <strong>${diffOldThousand}</strong> thousand years ${oldRelation} the oldest recorded civilization (representative date: 3500 B.C.).</p>
+      `;
+      
+      document.getElementById('result').innerHTML = resultMsg;
+    }
+  </script>
+</body>
+</html>
